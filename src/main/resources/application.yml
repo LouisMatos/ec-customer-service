@@ -23,7 +23,7 @@ logging:
     org.springframework.data.mongodb: INFO
     br.matosit.customer_service: INFO
   pattern: 
-    console: "[%d{yyyy-MM-dd HH:mm:ss}] [X-ReqID=%X{CorrelationId}] [%-5level] [%logger{70}] - %msg%n"
+    console: "[%d{yyyy-MM-dd HH:mm:ss}] [X-ReqID=%X{X-ReqId}] [%-5level] [%logger{70}] - %msg%n"
 
 cors:
   origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
