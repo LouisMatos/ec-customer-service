@@ -42,9 +42,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Clean untracked files
-        run: git clean -fd
-
       - name: Configure Git User
         run: |
           git config --global user.email "luismatos000@gmail.com"
