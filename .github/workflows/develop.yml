@@ -137,6 +137,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch all branches
+        run: git fetch --all
+
       - name: Get latest tag
         id: get-latest-tag
         run: |
@@ -172,9 +175,11 @@ jobs:
       - name: Verify deployment branch
         id: verify-branch
         run: |
-          COMMITS=$(git log main..deployment/${{ steps.get-latest-tag.outputs.version }} --oneline)
+          git fetch origin master:master
+          git fetch origin deployment/${{ steps.get-latest-tag.outputs.version }}:deployment/${{ steps.get-latest-tag.outputs.version }}
+          COMMITS=$(git log master..deployment/${{ steps.get-latest-tag.outputs.version }} --oneline)
           if [ -z "$COMMITS" ]; then
-            echo "No commits between main and deployment/${{ steps.get-latest-tag.outputs.version }}"
+            echo "No commits between master and deployment/${{ steps.get-latest-tag.outputs.version }}"
             exit 1
           fi
 
@@ -202,7 +207,7 @@ jobs:
             ### Próximos Passos
             1. Realizar deploy em homologação
             2. Após validação, realizar deploy em produção" \
-            --base main \
+            --base master \
             --head deployment/${{ steps.get-latest-tag.outputs.version }} \
             --label "release" \
             --label "deployment"
