@@ -24,7 +24,10 @@ public class Customer {
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.addresses = addresses != null ? addresses : new ArrayList<>();
+        this.addresses = new ArrayList<>();
+        if (addresses != null) {
+            this.addresses.addAll(addresses);
+        }
     }
 
     // Getters
@@ -36,8 +39,8 @@ public class Customer {
 
     // Métodos de domínio
     public void addAddress(Address address) {
-        if (this.addresses == null) {
-            this.addresses = new ArrayList<>();
+        if (address == null) {
+            throw new IllegalArgumentException("Endereço não pode ser nulo");
         }
         this.addresses.add(address);
     }

@@ -1,0 +1,13 @@
+[gitflow "branch"]
+master = main
+develop = develop
+feature = feature/
+release = release/
+hotfix = hotfix/
+support = support/
+
+[gitflow "prefix"]
+versiontag = v
+
+[gitflow "path"]
+hooks = .gitflow/hooks 
