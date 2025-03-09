@@ -35,5 +35,27 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
 
+  create-pull-request:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, security-scan]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'Luis Matos'
+          git config --global user.email 'luismatos000@gmail.com'
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          base: develop
+          branch: ${{ github.ref }}
+          title: 'Automated Pull Request from Feature Branch'
+          body: 'This pull request was automatically created by GitHub Actions.'
+          labels: 'automated'
+          assignees: 'matosit'
+          
 
 
