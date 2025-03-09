@@ -30,6 +30,16 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
 
+      - name: Install Git LFS
+        run: git lfs install
+
+      - name: Track large files with Git LFS
+        run: |
+          git lfs track ".cache/trivy/db/trivy.db"
+          git add .gitattributes
+          git add .cache/trivy/db/trivy.db
+          git commit -m "Track large file with Git LFS"
+
       - name: Create Pull Request
         if: success()
         uses: peter-evans/create-pull-request@v5
