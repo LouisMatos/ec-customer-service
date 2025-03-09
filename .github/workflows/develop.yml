@@ -50,6 +50,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Verify Docker image exists
+        run: |
+          docker images ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_ID }}
+
       - name: Docker image to cache
         run: |
           docker save ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_ID }} -o image.tar
