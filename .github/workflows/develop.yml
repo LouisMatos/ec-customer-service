@@ -49,14 +49,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Save Docker image to cache
+        run: |
+          docker save ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_ID }} -o image.tar
+        uses: actions/cache@v3
+        with:
+          path: image.tar
+          key: ${{ env.IMAGE_NAME }}-${{ env.BUILD_ID }}
+
   security-scan:
     name: Security Scan
     needs: build
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Restore Docker image from cache
+        uses: actions/cache@v3
+        with:
+          path: image.tar
+          key: ${{ env.IMAGE_NAME }}-${{ needs.build.outputs.build_id }}
+
+      - name: Load Docker image
+        run: docker load -i image.tar
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
