@@ -1,3 +1,4 @@
+
 name: Feature Branch Validation
 
 on:
@@ -33,20 +34,20 @@ jobs:
         if: success()
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           title: 'feat: ${{ github.ref_name }}'
           body: |
             ## Descrição
             Pull Request automático criado a partir da branch ${{ github.ref_name }}
-            
+
             ## Checklist de Validação
             - ✅ Testes unitários passaram
             - ✅ Análise de segurança concluída
-            
+
             Por favor, revise as alterações e aprove se estiver tudo correto.
           base: 'develop'
           branch: ${{ github.ref_name }}
           draft: false
           labels: |
             automated-pr
-            feature 
+            feature
