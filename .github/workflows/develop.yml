@@ -175,8 +175,9 @@ jobs:
       - name: Verify deployment branch
         id: verify-branch
         run: |
-          git fetch origin master:master
-          git fetch origin deployment/${{ steps.get-latest-tag.outputs.version }}:deployment/${{ steps.get-latest-tag.outputs.version }}
+          git fetch origin
+          git checkout master
+          git checkout deployment/${{ steps.get-latest-tag.outputs.version }}
           COMMITS=$(git log master..deployment/${{ steps.get-latest-tag.outputs.version }} --oneline)
           if [ -z "$COMMITS" ]; then
             echo "No commits between master and deployment/${{ steps.get-latest-tag.outputs.version }}"
