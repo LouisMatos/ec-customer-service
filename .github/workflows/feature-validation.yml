@@ -35,11 +35,15 @@ jobs:
           format: 'table'
           severity: 'CRITICAL,HIGH'
 
+
   create-pull-request:
     runs-on: ubuntu-latest
     needs: [unit-tests, security-scan]
     steps:
       - uses: actions/checkout@v3
+
+      - name: Clean untracked files
+        run: git clean -fd
 
       - name: Configure Git User
         run: |
