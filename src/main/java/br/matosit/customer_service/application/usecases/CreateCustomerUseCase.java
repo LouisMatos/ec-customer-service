@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import br.matosit.customer_service.application.ports.CustomerRepository;
 import br.matosit.customer_service.domain.entities.Customer;
+import br.matosit.customer_service.domain.exceptions.CustomerAlreadyExistsException;
 
 @Service
 public class CreateCustomerUseCase {
@@ -17,7 +18,7 @@ public class CreateCustomerUseCase {
         // Validação de negócio
         Customer existingCustomer = customerRepository.findByEmail(customer.getEmail());
         if (existingCustomer != null) {
-            throw new IllegalArgumentException("Cliente já existe com este email");
+            throw new CustomerAlreadyExistsException(customer.getEmail());
         }
         
         // Persistir e retornar

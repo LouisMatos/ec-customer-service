@@ -1,0 +1,52 @@
+name: Feature Branch Validation
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Unit Tests
+        run: mvn test
+
+      - name: Run Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: 'feat: ${{ github.ref_name }}'
+          body: |
+            ## Descrição
+            Pull Request automático criado a partir da branch ${{ github.ref_name }}
+            
+            ## Checklist de Validação
+            - ✅ Testes unitários passaram
+            - ✅ Análise de segurança concluída
+            
+            Por favor, revise as alterações e aprove se estiver tudo correto.
+          base: 'develop'
+          branch: ${{ github.ref_name }}
+          draft: false
+          labels: |
+            automated-pr
+            feature 
