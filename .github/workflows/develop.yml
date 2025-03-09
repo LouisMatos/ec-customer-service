@@ -1,0 +1,157 @@
+name: Docker Build and Push
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - develop
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    name: Build Docker Image
+    if: github.event.pull_request.merged == true && contains(github.head_ref, 'feature/')
+    runs-on: ubuntu-latest
+    outputs:
+      build_id: ${{ steps.tag.outputs.build_id }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate build ID
+        id: tag
+        run: |
+          BUILD_ID=$(date +%Y%m%d).$(date +%H%M%S)
+          echo "build_id=${BUILD_ID}" >> $GITHUB_OUTPUT
+          echo "BUILD_ID=${BUILD_ID}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and cache Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.BUILD_ID }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  security-scan:
+    name: Security Scan
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.build_id }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  push:
+    name: Push to Registry
+    needs: [build, security-scan]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build.outputs.build_id }}
+          cache-from: type=gha
+
+  create-release-tag:
+    name: Create Release Tag and PR
+    needs: [push]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get-latest-tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag -l 'v*' | sort -V | tail -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            echo "version=v1.0.0" >> $GITHUB_OUTPUT
+          else
+            CURRENT_VERSION=$(echo $LATEST_TAG | sed 's/v//')
+            MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+            MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+            PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+            NEW_PATCH=$((PATCH + 1))
+            echo "version=v$MAJOR.$MINOR.$NEW_PATCH" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        run: |
+          echo "Criando tag ${{ steps.get-latest-tag.outputs.version }}"
+          git tag ${{ steps.get-latest-tag.outputs.version }}
+          git push origin ${{ steps.get-latest-tag.outputs.version }}
+
+      - name: Create deployment branch
+        run: |
+          git checkout -b deployment/${{ steps.get-latest-tag.outputs.version }}
+          echo "IMAGE_TAG=${{ needs.build.outputs.build_id }}" > .env.deployment
+          git add .env.deployment
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "chore: adiciona configuração de deployment para ${{ steps.get-latest-tag.outputs.version }}"
+          git push origin deployment/${{ steps.get-latest-tag.outputs.version }}
+
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "Release ${{ steps.get-latest-tag.outputs.version }}" \
+            --body "## Nova Release para Homologação/Produção
+            
+            ### Tag da Imagem Docker
+            \`${{ needs.build.outputs.build_id }}\`
+            
+            ### Changelog
+            Esta release inclui todas as alterações da branch develop até o commit atual.
+            
+            ### Próximos Passos
+            1. Realizar deploy em homologação
+            2. Após validação, realizar deploy em produção" \
+            --base main \
+            --head deployment/${{ steps.get-latest-tag.outputs.version }} \
+            --label "release" \
+            --label "deployment" 
