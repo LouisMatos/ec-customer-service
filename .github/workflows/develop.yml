@@ -169,6 +169,13 @@ jobs:
           git commit -m "chore: adiciona configuração de deployment para ${{ steps.get-latest-tag.outputs.version }}"
           git push origin deployment/${{ steps.get-latest-tag.outputs.version }}
 
+      - name: Create labels
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          gh label create release --description "Release label" --color "#f29513" || true
+          gh label create deployment --description "Deployment label" --color "#0e8a16" || true
+
       - name: Create Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
