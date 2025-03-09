@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: louis_matos/ec-customer-service
+  IMAGE_NAME: testeluismatos/ec-customer-service
 
 jobs:
   build:
