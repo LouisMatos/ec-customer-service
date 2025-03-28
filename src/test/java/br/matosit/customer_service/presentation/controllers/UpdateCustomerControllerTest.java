@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import br.matosit.customer_service.application.ports.CustomerRepository;
 import br.matosit.customer_service.application.usecases.UpdateCustomerUseCase;
 import br.matosit.customer_service.infrastructure.persistence.MongoCustomerRepository;
 
@@ -23,7 +24,7 @@ public class UpdateCustomerControllerTest {
   private UpdateCustomerUseCase updateCustomerUseCase;
 
   @MockBean
-  private MongoCustomerRepository mogoCustomerRepository;
+  private CustomerRepository customerRepository;
 
   private ObjectMapper objectMapper;
 

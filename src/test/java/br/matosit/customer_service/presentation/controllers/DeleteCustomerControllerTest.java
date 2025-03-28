@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import br.matosit.customer_service.application.ports.CustomerRepository;
 import br.matosit.customer_service.application.usecases.DeleteCustomerUseCase;
 import br.matosit.customer_service.domain.exceptions.CustomerNotFoundException;
-import br.matosit.customer_service.infrastructure.persistence.MongoCustomerRepository;
 
 @WebMvcTest(DeleteCustomerController.class)
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +31,7 @@ public class DeleteCustomerControllerTest {
   private DeleteCustomerUseCase deleteCustomerUseCase;
 
   @MockBean
-  private MongoCustomerRepository mogoCustomerRepository;
+  private CustomerRepository customerRepository;
   
   @InjectMocks
   private DeleteCustomerController deleteCustomerController;

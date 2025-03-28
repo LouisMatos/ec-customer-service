@@ -15,10 +15,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import br.matosit.customer_service.application.ports.CustomerRepository;
 import br.matosit.customer_service.application.usecases.CreateCustomerUseCase;
 import br.matosit.customer_service.domain.entities.Address;
 import br.matosit.customer_service.domain.entities.Customer;
-import br.matosit.customer_service.infrastructure.persistence.MongoCustomerRepository;
 import br.matosit.customer_service.presentation.requests.AddressRequest;
 import br.matosit.customer_service.presentation.requests.CreateCustomerRequest;
 
@@ -32,7 +32,7 @@ public class CreateCustomerControllerTest {
   private MockMvc mockMvc;
 
   @MockBean
-  private MongoCustomerRepository mongoCustomerRepository;
+  private CustomerRepository customerRepository;
 
   @BeforeEach
   public void setUp() {
@@ -54,7 +54,7 @@ public class CreateCustomerControllerTest {
         new Address("123 Main St", "456", "Apt 789", "Downtown", "Springfield", "IL", "62704")));
 
     when(createCustomerUseCase.execute(any(Customer.class))).thenReturn(customer);
-    when(mongoCustomerRepository.save(any(Customer.class))).thenReturn(customer);
+    when(customerRepository.save(any(Customer.class))).thenReturn(customer);
 
     mockMvc
         .perform(post("/api/customers").contentType(MediaType.APPLICATION_JSON)

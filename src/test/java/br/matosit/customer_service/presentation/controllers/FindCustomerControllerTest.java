@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import br.matosit.customer_service.application.ports.CustomerRepository;
 import br.matosit.customer_service.application.usecases.FindCustomerUseCase;
 import br.matosit.customer_service.domain.entities.Customer;
 import br.matosit.customer_service.domain.exceptions.CustomerNotFoundException;
@@ -31,7 +32,7 @@ public class FindCustomerControllerTest {
     private FindCustomerUseCase findCustomerUseCase;
 
     @MockBean
-    private MongoCustomerRepository mogoCustomerRepository;
+    private CustomerRepository customerRepository;
 
     @BeforeEach
     public void setUp() {
