@@ -84,8 +84,6 @@ public class CreateCustomerControllerTest {
         .andExpect(status().isBadRequest());
   }
 
-  
-
   @Test
   public void testCreateCustomer_UseCaseException() throws Exception {
     CreateCustomerRequest request = new CreateCustomerRequest("John Doe", "john.doe@example.com",
@@ -123,6 +121,4 @@ public class CreateCustomerControllerTest {
             .content(new ObjectMapper().writeValueAsString(request)))
         .andExpect(status().isBadRequest());
   }
-
-
 }
