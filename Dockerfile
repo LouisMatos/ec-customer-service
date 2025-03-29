@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-alpine as build
+FROM eclipse-temurin:21.0.2_13-jdk-alpine as build
 WORKDIR /workspace/app
 
 COPY mvnw .
