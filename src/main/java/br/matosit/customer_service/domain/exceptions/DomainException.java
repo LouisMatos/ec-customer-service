@@ -1,9 +1,10 @@
 package br.matosit.customer_service.domain.exceptions;
 
 public abstract class DomainException extends RuntimeException {
+
   /**
-  * 
-  */
+   *
+   */
   private static final long serialVersionUID = 3200813964559214466L;
   private final String code;
 

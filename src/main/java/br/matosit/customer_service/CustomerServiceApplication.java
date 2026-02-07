@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@EnableMongoRepositories
+@EnableMongoRepositories(basePackages = "br.matosit.customer_service.adapters.out.persistence")
 @SpringBootApplication
 public class CustomerServiceApplication {
 

@@ -1,6 +1,7 @@
 package br.matosit.customer_service.domain.entities;
 
 public class Address {
+
   private String street;
   private String number;
   private String complement;

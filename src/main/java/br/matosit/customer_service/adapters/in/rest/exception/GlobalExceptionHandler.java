@@ -1,4 +1,4 @@
-package br.matosit.customer_service.adapters.in.rest.handlers;
+package br.matosit.customer_service.adapters.in.rest.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import br.matosit.customer_service.adapters.in.rest.responses.ErrorResponse;
+import br.matosit.customer_service.adapters.in.rest.dto.ErrorResponse;
 import br.matosit.customer_service.domain.exceptions.CustomerAlreadyExistsException;
 import br.matosit.customer_service.domain.exceptions.CustomerNotFoundException;
 import br.matosit.customer_service.domain.exceptions.DomainException;

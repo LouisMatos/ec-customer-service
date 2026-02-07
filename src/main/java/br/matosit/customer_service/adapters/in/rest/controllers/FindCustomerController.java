@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.matosit.customer_service.adapters.in.rest.mappers.CustomerMapper;
-import br.matosit.customer_service.adapters.in.rest.responses.CustomerResponse;
+import br.matosit.customer_service.adapters.in.rest.dto.CustomerResponse;
 import br.matosit.customer_service.application.ports.in.FindCustomerUseCase;
 import br.matosit.customer_service.domain.entities.Customer;
 
