@@ -1,12 +1,11 @@
-package br.matosit.customer_service.adapters.in.rest.requests;
+package br.matosit.customer_service.adapters.in.rest.dto;
 
 import java.util.List;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
-public record CreateCustomerRequest(
+public record UpdateCustomerRequest(
     @NotBlank(message = "Nome é obrigatório")
     String name,
 
@@ -19,4 +18,6 @@ public record CreateCustomerRequest(
 
     @NotEmpty(message = "Pelo menos um endereço é obrigatório")
     List<AddressRequest> addresses
-) {} 
+) {
+
+}

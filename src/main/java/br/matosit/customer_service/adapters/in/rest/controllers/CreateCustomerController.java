@@ -1,6 +1,7 @@
 package br.matosit.customer_service.adapters.in.rest.controllers;
 
 import java.net.URI;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.matosit.customer_service.adapters.in.rest.mappers.CustomerMapper;
-import br.matosit.customer_service.adapters.in.rest.requests.CreateCustomerRequest;
-import br.matosit.customer_service.adapters.in.rest.responses.CustomerResponse;
+import br.matosit.customer_service.adapters.in.rest.dto.CreateCustomerRequest;
+import br.matosit.customer_service.adapters.in.rest.dto.CustomerResponse;
 import br.matosit.customer_service.application.ports.in.CreateCustomerUseCase;
 import br.matosit.customer_service.domain.entities.Customer;
 import jakarta.validation.Valid;

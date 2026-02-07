@@ -1,3 +1,8 @@
+# Thread / performance tuning (parametrizável via variáveis de ambiente)
+# Ajuste os valores conforme capacidade do nó/cluster. São defaults conservadores.
+# Recomendação: tune de acordo com CPU e perfil (IO-bound vs CPU-bound).
+
+# Task executor (used by Spring @Async and scheduling)
 spring:
   profiles:
     active: ${APP_PROFILE:dev}
@@ -5,24 +10,57 @@ spring:
     add-properties: false
   main:
     banner-mode: "CONSOLE"   # por algum motivo tem que ser entre aspas duplas
-    allow-bean-definition-overriding: true  
+    allow-bean-definition-overriding: true
   application:
     name: customer-service
   data:
     mongodb:
-      uri: mongodb://root:MongoDB2025!@localhost:27019/customer-service?authSource=admin
+      # Ajuste a URI para incluir parâmetros de pooling e timeouts
+      uri: ${MONGODB_URI:mongodb://root:MongoDB2025!@localhost:27019/customer-service?authSource=admin&maxPoolSize=100&minPoolSize=5&maxIdleTimeMS=300000&waitQueueTimeoutMS=5000&connectTimeoutMS=10000&serverSelectionTimeoutMS=30000}
       database: customer-service
       auto-index-creation: true
       uuid-representation: standard
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=5000,expireAfterAccess=10m,recordStats=true
+  task:
+    execution:
+      pool:
+        core-size: ${TASK_CORE_SIZE:2}
+        max-size: ${TASK_MAX_SIZE:20}
+        queue-capacity: ${TASK_QUEUE_CAPACITY:500}
+        keep-alive: ${TASK_KEEP_ALIVE:60s}
+      thread-name-prefix: task-exec-
+  mvc:
+    async:
+      request-timeout: ${MVC_ASYNC_TIMEOUT:30000}
 
 server:
   port: 8080
+  servlet:
+    context-path: /
+  # Tomcat connector tuning (parametrizável)
+  tomcat:
+    max-threads: ${SERVER_TOMCAT_MAX_THREADS:200}
+    min-spare-threads: ${SERVER_TOMCAT_MIN_SPARE_THREADS:10}
+    accept-count: ${SERVER_TOMCAT_ACCEPT_COUNT:100}
+    connection-timeout: ${SERVER_TOMCAT_CONN_TIMEOUT:20000}
+    # máximo de conexões TCP simultâneas (incluir tuning conforme infra)
+    max-connections: ${SERVER_TOMCAT_MAX_CONNECTIONS:10000}
+    # tempo de keep-alive em ms
+    keep-alive-timeout: ${SERVER_TOMCAT_KEEP_ALIVE:60000}
+  # HTTP compression para reduzir uso de banda e latência percebida
+  compression:
+    enabled: ${SERVER_COMPRESSION_ENABLED:true}
+    mime-types: text/html,text/xml,text/plain,application/json,application/xml
+    min-response-size: ${SERVER_COMPRESSION_MIN_RESPONSE_SIZE:1024}
 
 logging:
   level:
     org.springframework.data.mongodb: INFO
     br.matosit.customer_service: INFO
-  pattern: 
+  pattern:
     console: "[%d{yyyy-MM-dd HH:mm:ss}] [X-ReqID=%X{X-ReqId}] [%-5level] [%logger{70}] - %msg%n"
 
 cors:
@@ -41,5 +79,19 @@ management:
         include: health,info
   endpoint:
     health:
-      show-details: always 
-      
+      show-details: always
+
+# Propriedades custom para clientes HTTP (usar ao configurar WebClient/RestTemplate)
+http:
+  client:
+    connect-timeout-ms: ${HTTP_CLIENT_CONNECT_TIMEOUT_MS:10000}
+    response-timeout-ms: ${HTTP_CLIENT_RESPONSE_TIMEOUT_MS:30000}
+    pool:
+      max-connections: ${HTTP_CLIENT_POOL_MAX:100}
+      acquire-timeout-ms: ${HTTP_CLIENT_POOL_ACQUIRE_TIMEOUT_MS:5000}
+
+# Observações:
+# - Ajuste os valores acima de acordo com as resources do contêiner (CPU, memória).
+# - JVM flags devem ser aplicadas via JAVA_OPTS no Dockerfile / Deployment (ex.: -Xms -Xmx -XX:+UseZGC).
+# - Habilite cache somente para dados com validade controlada (TTL ou invalidação).
+

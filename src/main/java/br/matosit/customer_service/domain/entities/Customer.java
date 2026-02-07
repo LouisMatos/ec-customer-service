@@ -2,21 +2,12 @@ package br.matosit.customer_service.domain.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "customers")
 public class Customer {
 
-  @Id
   private String id;
-
   private String name;
-
-  @Indexed(unique = true)
   private String email;
-
   private String phone;
   private List<Address> addresses;
 

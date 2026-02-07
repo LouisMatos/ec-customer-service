@@ -13,11 +13,26 @@ spec:
       labels:
         app: customer-service
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - customer-service
+                topologyKey: "kubernetes.io/hostname"
       containers:
       - name: customer-service
         image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
         ports:
         - containerPort: 8080
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=80.0 -XX:ActiveProcessorCount=2"
         resources:
           requests:
             memory: "512Mi"
@@ -58,11 +73,26 @@ spec:
       labels:
         app: customer-service
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - customer-service
+                topologyKey: "kubernetes.io/hostname"
       containers:
       - name: customer-service
         image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
         ports:
         - containerPort: 8080
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=80.0 -XX:ActiveProcessorCount=2"
         resources:
           requests:
             memory: "1Gi"
@@ -86,4 +116,44 @@ spec:
             path: /actuator/health
             port: 8080
           initialDelaySeconds: 30
-          periodSeconds: 10 
+          periodSeconds: 10
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: customer-service-hpa
+  namespace: development
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: customer-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: customer-service-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: customer-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

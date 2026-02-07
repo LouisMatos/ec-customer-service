@@ -1,9 +1,9 @@
 package br.matosit.customer_service.adapters.in.rest.mappers;
 
 import java.util.stream.Collectors;
-import br.matosit.customer_service.adapters.in.rest.requests.CreateCustomerRequest;
-import br.matosit.customer_service.adapters.in.rest.requests.UpdateCustomerRequest;
-import br.matosit.customer_service.adapters.in.rest.responses.CustomerResponse;
+import br.matosit.customer_service.adapters.in.rest.dto.CreateCustomerRequest;
+import br.matosit.customer_service.adapters.in.rest.dto.UpdateCustomerRequest;
+import br.matosit.customer_service.adapters.in.rest.dto.CustomerResponse;
 import br.matosit.customer_service.domain.entities.Customer;
 import jakarta.validation.Valid;
 

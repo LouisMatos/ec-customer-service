@@ -1,4 +1,4 @@
-package br.matosit.customer_service.adapters.in.rest.responses;
+package br.matosit.customer_service.adapters.in.rest.dto;
 
 public record AddressResponse(
     String street,
@@ -8,4 +8,6 @@ public record AddressResponse(
     String city,
     String state,
     String zipCode
-) {}
+) {
+
+}
